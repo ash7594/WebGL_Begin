@@ -35,6 +35,7 @@ function init() {
 	camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
 	scene.add(camera);
 	camera.position.z = 50;
+	//camera.rotation.z = 0.1;
 
 	renderer = new THREE.WebGLRenderer({alpha: true});
 	renderer.setSize(window.innerWidth,window.innerHeight);
@@ -43,8 +44,18 @@ function init() {
 }
 
 function plane() {
-	geometry = new THREE.PlaneGeometry(50,50,5,5);
-	material = new THREE.MeshPhongMaterial({color: 0x0000ff, wireframe: true});
+	geometry = new THREE.PlaneGeometry(50,50,0,0);
+	for(var i=0;i<geometry.faces.length;i+=2) {
+		geometry.faces[i].vertexColors[0] = new THREE.Color(0xff0000);
+		geometry.faces[i].vertexColors[1] = new THREE.Color(0x00ff00);
+		geometry.faces[i].vertexColors[2] = new THREE.Color(0x0000ff);
+
+		geometry.faces[i+1].vertexColors[0] = new THREE.Color(0x00ff00);
+		geometry.faces[i+1].vertexColors[1] = new THREE.Color(0xff0000);
+		geometry.faces[i+1].vertexColors[2] = new THREE.Color(0x0000ff);
+	}
+
+	material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors, wireframe: false});
 	material.side = THREE.DoubleSide;
 	plane = new THREE.Mesh(geometry,material);
 	scene.add(plane);
