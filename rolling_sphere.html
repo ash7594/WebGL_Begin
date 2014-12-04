@@ -29,13 +29,17 @@ canvas {
 
 var scene,camera,renderer;
 var geometry,material,plane;
+var keys = [];
+
+window.addEventListener("keydown",function(e) { keys[e.keyCode] = true;});
+window.addEventListener("keyup",function(e) { keys[e.keyCode] = false;});
 
 function init() {
 	scene = new THREE.Scene();
 	camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
 	scene.add(camera);
 	camera.position.z = 50;
-	//camera.rotation.z = 0.1;
+	camera.position.y = 20;
 
 	renderer = new THREE.WebGLRenderer({alpha: true});
 	renderer.setSize(window.innerWidth,window.innerHeight);
@@ -44,7 +48,7 @@ function init() {
 }
 
 function plane() {
-	geometry = new THREE.PlaneGeometry(50,50,0,0);
+	geometry = new THREE.PlaneGeometry(500,500,50,50);
 	for(var i=0;i<geometry.faces.length;i+=2) {
 		geometry.faces[i].vertexColors[0] = new THREE.Color(0xff0000);
 		geometry.faces[i].vertexColors[1] = new THREE.Color(0x00ff00);
@@ -59,11 +63,29 @@ function plane() {
 	material.side = THREE.DoubleSide;
 	plane = new THREE.Mesh(geometry,material);
 	scene.add(plane);
+
+	plane.rotation.x = Math.PI/2;
+}
+
+function keyMove() {
+	if(keys[37]) {
+		camera.position.x -= 1;
+	}
+	if(keys[39]) {
+		camera.position.x += 1;
+	}
+	if(keys[38]) {
+		camera.position.z -= 2;
+	}
+	if(keys[40]) {
+		camera.position.z += 2;
+	}
 }
 
 function render() {
 	requestAnimationFrame(render);
-	plane.rotation.x += 0.01;
+	//plane.rotation.x += 0.01;
+	keyMove();
 	renderer.render(scene,camera);
 }
 
