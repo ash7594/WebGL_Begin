@@ -29,6 +29,7 @@ canvas {
 
 var scene,camera,renderer;
 var geometry,material,plane;
+var sphere;
 var keys = [];
 
 window.addEventListener("keydown",function(e) { keys[e.keyCode] = true;});
@@ -38,7 +39,7 @@ function init() {
 	scene = new THREE.Scene();
 	camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
 	scene.add(camera);
-	camera.position.z = 50;
+	camera.position.z = 40;
 	camera.position.y = 20;
 
 	renderer = new THREE.WebGLRenderer({alpha: true});
@@ -48,7 +49,7 @@ function init() {
 }
 
 function plane() {
-	geometry = new THREE.PlaneGeometry(500,500,50,50);
+	geometry = new THREE.PlaneGeometry(1000,1000,100,100);
 	for(var i=0;i<geometry.faces.length;i+=2) {
 		geometry.faces[i].vertexColors[0] = new THREE.Color(0x000000);
 		geometry.faces[i].vertexColors[1] = new THREE.Color(0xffffff);
@@ -60,25 +61,35 @@ function plane() {
 	}
 
 	material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors, wireframe: false});
-	material.side = THREE.DoubleSide;
+	//material.side = THREE.DoubleSide;
 	plane = new THREE.Mesh(geometry,material);
 	scene.add(plane);
 
-	plane.rotation.x = Math.PI/2;
+	plane.rotation.x = 3*Math.PI/2;
+}
+
+function createSphere() {
+	sphere = new THREE.Mesh(new THREE.SphereGeometry(10,100,100),new THREE.MeshNormalMaterial());
+	scene.add(sphere);
+	sphere.position.y = 10;
 }
 
 function keyMove() {
 	if(keys[37]) {
 		camera.position.x -= 1;
+		sphere.position.x -= 1;
 	}
 	if(keys[39]) {
 		camera.position.x += 1;
+		sphere.position.x += 1;
 	}
 	if(keys[38]) {
 		camera.position.z -= 2;
+		sphere.position.z -= 2;
 	}
 	if(keys[40]) {
 		camera.position.z += 2;
+		sphere.position.z += 2;
 	}
 }
 
@@ -91,6 +102,7 @@ function render() {
 
 init();
 plane();
+createSphere();
 render();
 
 </script>
