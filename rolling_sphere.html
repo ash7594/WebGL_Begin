@@ -32,8 +32,16 @@ var geometry,material,plane;
 var sphere;
 var keys = [];
 
+var x_rot = 0,
+	y_rot = 0,
+	z_rot = 0;
+
 window.addEventListener("keydown",function(e) { keys[e.keyCode] = true;});
-window.addEventListener("keyup",function(e) { keys[e.keyCode] = false;});
+window.addEventListener("keyup",function(e) { keys[e.keyCode] = false; /*sphere.rotation.set(0,0,0); */});
+
+var xAxis = new THREE.Vector3(1,0,0);
+var yAxis = new THREE.Vector3(0,1,0);
+var zAxis = new THREE.Vector3(0,0,1);
 
 function init() {
 	scene = new THREE.Scene();
@@ -69,27 +77,61 @@ function plane() {
 }
 
 function createSphere() {
-	sphere = new THREE.Mesh(new THREE.SphereGeometry(10,100,100),new THREE.MeshNormalMaterial());
+	sphere = new THREE.Mesh(new THREE.SphereGeometry(10,20,20),new THREE.MeshBasicMaterial({color: 0x000000, wireframe: true}));
 	scene.add(sphere);
 	sphere.position.y = 10;
+	//sphere.useQuaterion = true;
+}
+
+var rotWorldMatrix;
+// Rotate an object around an arbitrary axis in world space       
+function rotateAroundWorldAxis(object, axis, radians) {
+    rotWorldMatrix = new THREE.Matrix4();
+    rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
+
+    // old code for Three.JS pre r54:
+    //  rotWorldMatrix.multiply(object.matrix);
+    // new code for Three.JS r55+:
+    rotWorldMatrix.multiply(object.matrix);                // pre-multiply
+
+    object.matrix = rotWorldMatrix;
+
+    // old code for Three.js pre r49:
+    // object.rotation.getRotationFromMatrix(object.matrix, object.scale);
+    // old code for Three.js pre r59:
+    // object.rotation.setEulerFromRotationMatrix(object.matrix);
+    // code for r59+:
+    object.rotation.setFromRotationMatrix(object.matrix);
 }
 
 function keyMove() {
 	if(keys[37]) {
 		camera.position.x -= 1;
 		sphere.position.x -= 1;
+		//z_rot += 2*Math.PI/180;
+		//sphere.rotation.set(x_rot,y_rot,z_rot);
+		rotateAroundWorldAxis(sphere, zAxis, Math.PI / 180);
 	}
 	if(keys[39]) {
 		camera.position.x += 1;
 		sphere.position.x += 1;
+		//z_rot -= 2*Math.PI/180;
+		//sphere.rotation.set(x_rot,y_rot,z_rot);
+		rotateAroundWorldAxis(sphere, zAxis, -1*Math.PI / 180);
 	}
 	if(keys[38]) {
-		camera.position.z -= 2;
-		sphere.position.z -= 2;
+		camera.position.z -= 1;
+		sphere.position.z -= 1;
+		//x_rot += 2*Math.PI/180;
+		//sphere.rotation.set(x_rot,y_rot,z_rot);
+		rotateAroundWorldAxis(sphere, xAxis, Math.PI / 180);
 	}
 	if(keys[40]) {
-		camera.position.z += 2;
-		sphere.position.z += 2;
+		camera.position.z += 1;
+		sphere.position.z += 1;
+		//x_rot -= 2*Math.PI/180;
+		//sphere.rotation.set(x_rot,y_rot,z_rot);
+		rotateAroundWorldAxis(sphere, xAxis, -1*Math.PI / 180);
 	}
 }
 
