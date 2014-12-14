@@ -2,7 +2,7 @@
 <head>
 <!--stars gaze-->
 <!--3 December 2014, 1100 hrs-->
-<script src="../js/three.js"></script>
+<script src="js/three.js"></script>
 <script src="orbit_controls.js"></script>
 <script src="track_ball_controls.js"></script>
 </head>
@@ -46,8 +46,9 @@ function initStage() {
     scene.add(camera);
     camera.position.z = 5;
     
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({alpha: true});
     renderer.setSize(window.innerWidth,window.innerHeight);
+    renderer.setClearColor(0xffffff,1);
     document.body.appendChild(renderer.domElement);
 }
 
@@ -58,8 +59,12 @@ function initLighting() {
 }
 
 function OBJcube() {
+    THREE.ImageUtils.crossOrigin = '';
+    //var image = new Image();
+    //image.src = "images/crate.jpg";
     geometry = new THREE.BoxGeometry(1,1,1);
-    material = new THREE.MeshPhongMaterial({color: 0x00ff00, wireframe: false});
+    //material = new THREE.MeshPhongMaterial({color: 0x00ff00, wireframe: true});
+    material = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('images/crate.jpg')});
     cube = new THREE.Mesh(geometry,material);
     scene.add(cube);
 }
@@ -81,7 +86,10 @@ function initControls() {
 
 function animate() {
     requestAnimationFrame(animate);
-    controls.update();
+    cube.rotation.x += 0.01;
+    cube.rotation.z += 0.01;
+    //controls.update();
+    render();
 }
 
 function render() {
@@ -91,8 +99,8 @@ function render() {
 initStage();
 initLighting();
 initControls();
-animate();
 OBJcube();
+animate();
 render();
 
 </script>
