@@ -1,0 +1,97 @@
+<html>
+<head>
+<!--info showcase 3D-->
+</head>
+
+<style>
+
+*, body {
+	margin: 0;
+	padding: 0;
+}
+
+canvas {
+	width: 100%;
+	height: 100%;
+}
+
+</style>
+
+<body>
+
+<script src="../js/three.js"></script>
+<script>
+
+var scene,camera,renderer;
+var planes = [];
+var keys = [];
+
+document.addEventListener("keydown",function(e) {keys[e.keyCode]=true});
+document.addEventListener("keyup",function(e) {keys[e.keyCode]=false});
+
+function init() {
+	scene = new THREE.Scene();
+	camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+	scene.add(camera);
+	//camera.position.y = -450;
+    camera.position.z = 300;
+    //camera.rotation.x = 90 * (Math.PI / 180);
+	
+	renderer = new THREE.WebGLRenderer({alpha:true});
+	renderer.setSize(window.innerWidth,window.innerHeight);
+	renderer.setClearColor(0xffffff,1);
+	document.body.appendChild(renderer.domElement);
+}
+
+function createPlanes() {
+	for(var k=0;k<=20;k++) {
+		for(var i=-10;i<=10;i++) {
+			for(var j=-10;j<=10;j++) {
+				plane(i*150,j*150,k*150);
+			}
+		}
+	}
+}
+
+function plane(x,y,z) {
+	var geometry = new THREE.PlaneGeometry(100,100);
+	var material = new THREE.MeshNormalMaterial();
+	var plane = new THREE.Mesh(geometry,material);
+	plane.position.x += x;
+	plane.position.y += y;
+	plane.position.z -= z;
+	
+	plane.overdraw = true;
+	scene.add(plane);
+	planes.push(plane);
+}
+
+function interactCam() {
+	if(keys[37]) {
+		camera.position.x -= 10;
+	}
+	if(keys[38]) {
+        camera.position.z -= 10;
+    }
+	if(keys[39]) {
+        camera.position.x += 10;
+    }
+	if(keys[40]) {
+        camera.position.z += 10;
+    }
+}
+
+function render() {
+	requestAnimationFrame(render);
+	//plane.rotation.z += 0.01;
+	interactCam();
+	renderer.render(scene,camera);
+}
+
+init();
+createPlanes();
+render();
+
+</script>
+</body>
+</html>
