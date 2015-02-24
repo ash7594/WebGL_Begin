@@ -120,7 +120,7 @@ function circle(x,y,z) {
 	var geometry = new THREE.CircleGeometry(25,8);
 	THREE.ImageUtils.crossOrigin = '';
 	var texture = THREE.ImageUtils.loadTexture('https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xap1/v/t1.0-1/c0.0.56.56/p56x56/10985242_934227183268201_1068029399536486042_n.jpg?oh=b24342e607421a5d3ccac916963ded39&oe=5593899F&__gda__=1434868643_22cd3a255b73c444d04123cfdd9229f7');
-	var material = new THREE.MeshBasicMaterial({map:texture,transparent:true,opacity:0.4});
+	var material = new THREE.MeshBasicMaterial({map:texture});
 	var circle = new THREE.Mesh(geometry,material);
 	circle.position.x += x;
 	circle.position.y += y;
@@ -181,9 +181,22 @@ function spyCamAnimate() {
 	} else if(planes[index].rotation.y != 0 && stay==-1) {
 		planes[index].rotation.y = 0;
 		stay = 0;
+		circles[0].position.z = z-1;
+		circles[0].position.y = y;
+		circles[0].position.x = x;
+	} else if(circles[0].position.y < y+50 && stay==0) {
+		circles[0].position.y += 5;
+	} else if(circles[0].position.y != y+60 && stay==0) {
+		circles[0].position.y = y+60;
+		circles[0].position.z = z+1;
 	} else if(stay != 100) {
 		stay++;
-	} else if(planes[index].rotation.y < (Math.PI-0.05)) {
+	} else if(circles[0].position.y > y) {
+		circles[0].position.z = z-1;
+        circles[0].position.y -= 5;
+    } else if(circles[0].position.z != 4000) {
+        circles[0].position.z = 4000;
+    } else if(planes[index].rotation.y < (Math.PI-0.05)) {
 		planes[index].rotation.y += 0.05;
 	} else if(planes[index].rotation.y != Math.PI) {
 		planes[index].rotation.y = Math.PI;
@@ -211,9 +224,10 @@ function render() {
 
 init();
 createPlanes();
+createCircle();
 //spyCamRandomSelect();
 render();
-setTimeout(function() {beginShowcase = true;},5000);
+setTimeout(function() {beginShowcase = true;},3000);
 
 </script>
 </body>
