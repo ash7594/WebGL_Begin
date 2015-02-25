@@ -32,6 +32,8 @@ var keys = [];
 
 var beginShowcase = false;
 var index = 60;
+var randomTunnel = -1;
+var move150 = 0;
 var stay = -1
 var canvas = document.createElement('canvas');
 var ctx = canvas.getContext('2d');
@@ -117,7 +119,7 @@ function plane(x,y,z) {
 }
 
 function circle(x,y,z) {
-	var geometry = new THREE.CircleGeometry(25,8);
+	var geometry = new THREE.CircleGeometry(20,8);
 	THREE.ImageUtils.crossOrigin = '';
 	var texture = THREE.ImageUtils.loadTexture('https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xap1/v/t1.0-1/c0.0.56.56/p56x56/10985242_934227183268201_1068029399536486042_n.jpg?oh=b24342e607421a5d3ccac916963ded39&oe=5593899F&__gda__=1434868643_22cd3a255b73c444d04123cfdd9229f7');
 	var material = new THREE.MeshBasicMaterial({map:texture});
@@ -148,6 +150,8 @@ function interactCam() {
 
 function spyCamRandomSelect() {
 	index = parseInt(Math.random() * planes.length);
+	randomTunnel = parseInt(Math.random() * 2);
+	move150 = 150;
 }
 
 function spyCamAnimate() {
@@ -158,7 +162,21 @@ function spyCamAnimate() {
 	var cy = Math.round(camera.position.y);
 	var cz = Math.round(camera.position.z);
 	
-	if(cz-z>160) {
+	if(move150>10) {
+		move150 -= 10;
+		if(randomTunnel==0) {
+			cx -= 10;
+		} else if(randomTunnel==1) {
+			cx += 10;
+		}
+	} else if(move150!=0) {
+        if(randomTunnel==0) {
+            cx -= move150;
+        } else if(randomTunnel==1) {
+            cx += move150;
+        }
+		move150 = 0;
+    } else if(cz-z>160) {
 		cz -= 10;
 	} else if(cz-z<140) {
 		cz += 10;
