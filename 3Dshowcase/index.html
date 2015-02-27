@@ -21,6 +21,7 @@ canvas {
 <body>
 
 <script src="../js/three.js"></script>
+<script src="content.js"></script>
 <script>
 
 var scene,camera,renderer;
@@ -37,8 +38,9 @@ var move150 = 0;
 var stay = -1
 var canvas = document.createElement('canvas');
 var ctx = canvas.getContext('2d');
-canvas.width = canvas.height = 100;
+canvas.width = canvas.height = 400;
 
+var jsonobj = JSON.parse(content);
 /////////////////////////////////
 
 document.addEventListener("keydown",function(e) {keys[e.keyCode]=true});
@@ -62,7 +64,7 @@ function createPlanes() {
 	for(var k=0;k<=10;k++) {
 		for(var i=-5;i<=5;i++) {
 			for(var j=-5;j<=5;j++) {
-				plane(i*300,j*300,k*200);
+				plane(i*300,j*300,k*200,60);
 			}
 		}
 	}
@@ -72,24 +74,26 @@ function createCircle() {
 	circle(0,0,4000);
 }
 
-function plane(x,y,z) {
-
+function plane(x,y,z,num) {
+	ctx.clearRect(0,0,canvas.width,canvas.height);
 	ctx.fillStyle = "#ff0000";
     ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = "#0000ff";
-	ctx.font = 15+"px serif";
-	var a = ctx.measureText("Mohit Goyal").width;
-	ctx.fillText("Mohit Goyal",(100-a)/2,40);
-    ctx.font = 10+"px serif";
-	var b = "\"Works at Delta - At NIT Trichy\"";
-	for(var h=60,i=0,j=0;j<b.length;j++) {
-		if(ctx.measureText(b.slice(i,j)).width >= 100) {
-			ctx.fillText(b.slice(i,j-5),(100-ctx.measureText(b.slice(i,j-5)).width)/2,h);
-			h+=20;
-			i=j-5;
+    ctx.fillStyle = "#000000";
+	ctx.font = 40+"px serif";
+	var a = ctx.measureText(jsonobj.people[num].name).width;
+	ctx.fillText(jsonobj.people[num].name,(400-a)/2,100);
+	ctx.fillStyle = "#ffffff";
+    ctx.font = 30+"px serif";
+	var b = "\""+jsonobj.people[num].about+"\"";
+	for(var h=170,i=0,j=0;j<=b.length;j++) {
+		if(ctx.measureText(b.slice(i,j)).width >= 350) {
+			while(b[--j]!=' ');
+			ctx.fillText(b.slice(i,j),(400-ctx.measureText(b.slice(i,j)).width)/2,h);
+			h+=40;
+			i=j+1;
 			j=i+1;
-		} else if(j>=b.length-1) {
-			ctx.fillText(b.slice(i,j),(100-ctx.measureText(b.slice(i,j)).width)/2,h);
+		} else if(j>=b.length) {
+			ctx.fillText(b.slice(i,j),(400-ctx.measureText(b.slice(i,j)).width)/2,h);
 		}
 	}
     var texture = new THREE.Texture(canvas);
@@ -111,7 +115,7 @@ function plane(x,y,z) {
 	plane.position.y += y;
 	plane.rotation.y += Math.PI;
 	plane.position.z -= z;
-
+   	//plane.ash = jsonobj.people[num].name; 
 	plane.material.side = THREE.DoubleSide;	
 	plane.overdraw = true;
 	scene.add(plane);
@@ -121,7 +125,7 @@ function plane(x,y,z) {
 function circle(x,y,z) {
 	var geometry = new THREE.CircleGeometry(20,8);
 	THREE.ImageUtils.crossOrigin = '';
-	var texture = THREE.ImageUtils.loadTexture('https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xap1/v/t1.0-1/c0.0.56.56/p56x56/10985242_934227183268201_1068029399536486042_n.jpg?oh=b24342e607421a5d3ccac916963ded39&oe=5593899F&__gda__=1434868643_22cd3a255b73c444d04123cfdd9229f7');
+	var texture = THREE.ImageUtils.loadTexture(jsonobj.people[60].url);
 	var material = new THREE.MeshBasicMaterial({map:texture});
 	var circle = new THREE.Mesh(geometry,material);
 	circle.position.x += x;
@@ -130,6 +134,7 @@ function circle(x,y,z) {
 
 	circle.overdraw = true;
 	scene.add(circle);
+	//circles = [];
 	circles.push(circle);
 }
 
@@ -148,13 +153,49 @@ function interactCam() {
     }
 }
 
+function addNewTextures(num) {
+	//circle
+	var texture = THREE.ImageUtils.loadTexture(jsonobj.people[num].url);
+	circles[0].material.map = texture;
+	texture.needsUpdate = true;
+
+	//planes
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#ff0000";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#000000";
+    ctx.font = 40+"px serif";
+    var a = ctx.measureText(jsonobj.people[num].name).width;
+    ctx.fillText(jsonobj.people[num].name,(400-a)/2,100);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = 30+"px serif";
+    var b = "\""+jsonobj.people[num].about+"\"";
+    for(var h=170,i=0,j=0;j<=b.length;j++) {
+        if(ctx.measureText(b.slice(i,j)).width >= 350) {
+            while(b[--j]!=' ');
+            ctx.fillText(b.slice(i,j),(400-ctx.measureText(b.slice(i,j)).width)/2,h);
+            h+=40;
+            i=j+1;
+            j=i+1;
+        } else if(j>=b.length) {
+            ctx.fillText(b.slice(i,j),(400-ctx.measureText(b.slice(i,j)).width)/2,h);
+        }
+    }
+    var texture = new THREE.Texture(canvas);
+	planes[num].material.materials[1].map = texture;
+	texture.needsUpdate = true;
+}
+
 function spyCamRandomSelect() {
 	index = parseInt(Math.random() * planes.length);
 	randomTunnel = parseInt(Math.random() * 2);
 	move150 = 150;
+	addNewTextures(index);
+	//createCircle(index);
 }
 
 function spyCamAnimate() {
+	
 	var x = Math.round(planes[index].position.x);
 	var y = Math.round(planes[index].position.y);
 	var z = Math.round(planes[index].position.z);
