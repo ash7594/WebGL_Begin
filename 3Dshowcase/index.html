@@ -1,58 +1,78 @@
 <html>
 	<head>
 	<!--info showcase 3D-->	
+	<script src="https://code.createjs.com/createjs-2014.12.12.min.js"></script>
 	</head>
 	<style>
 
 	*, body {
 		margin: 0;
 		padding: 0;
+		overflow: hidden;
 	}
 
 	</style>
 	<body onload="loadFiles()">
-	
-	<canvas id="myCanvas" width="960" height="400"></canvas>
 
-    <script src="https://code.createjs.com/createjs-2014.12.12.min.js"></script>
     <script>
-        
+        var bw,bh,bx,by;
 	var canvas,stage;
     function loadFiles() {
-        console.log("yea");
-		canvas = document.getElementById("myCanvas");
-        stage = new createjs.Stage(canvas);
-        createjs.Ticker.setFPS(30);
-        createjs.Ticker.addEventListener("tick", stage);
-
-        var progress = new createjs.Shape(); 
+        //console.log("yea");
+	canvas = document.createElement("canvas");
+	canvas.style.backgroundColor = "#000000";
+	var ctx = canvas.getContext("2d");
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	document.body.appendChild(canvas);
+        //stage = new createjs.Stage(canvas);
+        //createjs.Ticker.setFPS(30);
+        //createjs.Ticker.addEventListener("tick", stage);
+	
+	bw = canvas.width*0.2;
+	bh = canvas.height*0.03;
+	bx = (canvas.width-bw)/2;
+	by = (canvas.height-bh)/2;
+	ctx.strokeStyle = "#ffffff";
+	ctx.strokeRect(bx,by,bw,bh);
+        //var progress = new createjs.Shape(); 
         //var progressBellow = new createjs.Shape();
-        progress.graphics.beginStroke("#C33").drawRect(0,0,100,20);
+        //progress.graphics.beginStroke("#ffffff").drawRect(bx,by,bw,bh);
         //progressBellow.graphics.beginStroke("#fff").drawRect(0,0,100,20);
 
         var preload = new createjs.LoadQueue();
         preload.addEventListener("fileload", handleFileComplete);   
-        preload.addEventListener("complete", function() { beginShowcase = true; });
+        preload.addEventListener("complete", handleLoadComplete);
         preload.addEventListener("progress", handleProgress);    
         preload.loadFile("../js/three.js");
         preload.loadFile("content.js");
         preload.loadFile("show.js");
 
 		function handleProgress(event) {
-            progress.graphics.clear();
+            //progress.graphics.clear();
+		ctx.strokeStyle = "#ffffff";
+        ctx.strokeRect(bx,by,bw,bh);
             // Draw the progress bar
-            progress.graphics.beginFill("#ff9900").drawRect(0,0,100*(event.loaded / event.total),20);
-            console.log (100*(event.loaded / event.total));
+            //progress.graphics.beginFill("#ffffff").drawRect(bx,by,bw*(event.loaded / event.total),bh);
+        ctx.fillStyle = "#ffffff";
+	ctx.fillRect(bx,by,bw*(event.loaded/event.total),bh);    
+	//console.log (100*(event.loaded / event.total));
         }
-
-        stage.addChild(progress);
-        stage.update();
+	
+        //stage.addChild(progress);
+        //stage.update();
     }
 
     function handleFileComplete(event) {
         document.body.appendChild(event.result);
-		canvas.style.display = "none";
     }
+
+	function handleLoadComplete(event) {
+		setTimeout(function() {
+			document.body.removeChild(document.getElementsByTagName("canvas")[0]);
+			setTimeout(function(){beginShowcase = true;},1000);
+		},1000);
+	}
 
     </script>
 	</body>
